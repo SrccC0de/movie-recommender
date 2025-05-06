@@ -1,21 +1,5 @@
 import streamlit as st
 import pandas as pd
-import requests
-
-# OMDB API key
-API_KEY = 'c5d20c5e'
-
-# Function to get movie poster from OMDB
-def get_movie_poster(movie_name):
-    url = f"http://www.omdbapi.com/?t={movie_name}&apikey={API_KEY}"
-    response = requests.get(url)
-    data = response.json()
-
-    # Ensure there’s a poster URL
-    if data['Response'] == 'True' and 'Poster' in data:
-        return data['Poster']  # Return the valid poster URL
-    else:
-        return "https://via.placeholder.com/150?text=No+Poster"  # Default image if no poster found
 
 # Load dataset
 column_names = ['user_id', 'item_id', 'rating', 'timestamp']
@@ -56,13 +40,11 @@ st.title('Movie Recommender System')
 # Get user input for movie title
 movie_name = st.selectbox("Choose a Movie:", sorted(user_movie_matrix.columns))
 
-# Display recommendations with posters
+# Display recommendations without posters
 if movie_name:
     recommendations = get_similar_movies(movie_name)
     st.write(f"Top 10 Movies similar to **{movie_name}**:")
     
-    # Show the movie posters and recommendations
+    # Show the movie names and their similarity scores
     for index, row in recommendations.iterrows():
-        movie_poster = get_movie_poster(index)  # Fetch poster for the movie
-        st.image(movie_poster, width=100)  # Display poster with a fixed width
         st.write(f"{index} - Correlation: {row['correlation']} (Ratings: {row['num_ratings']})")
