@@ -1,8 +1,20 @@
 import streamlit as st
 import pandas as pd
+import requests
 
-import pandas as pd
-import streamlit as st
+# OMDB API key
+API_KEY = 'c5d20c5e'
+
+# Function to get movie poster from OMDB
+def get_movie_poster(movie_name):
+    url = f"http://www.omdbapi.com/?t={movie_name}&apikey={API_KEY}"
+    response = requests.get(url)
+    data = response.json()
+
+    if data['Response'] == 'True':
+        return data['Poster']  # Returning the poster URL
+    else:
+        return None
 
 # Load dataset
 column_names = ['user_id', 'item_id', 'rating', 'timestamp']
@@ -21,9 +33,7 @@ ratings_summary.columns = ['mean_rating', 'num_ratings']
 # Create user-movie matrix
 user_movie_matrix = movie_data.pivot_table(index='user_id', columns='title', values='rating')
 
-# Load your movie recommendation function and the necessary data
-# Make sure you have the get_similar_movies function and the DataFrame already set up
-
+# Function to get similar movies
 def get_similar_movies(movie_name, min_ratings=100):
     if movie_name not in user_movie_matrix.columns:
         return f"Movie '{movie_name}' not found in dataset."
@@ -45,8 +55,14 @@ st.title('Movie Recommender System')
 # Get user input for movie title
 movie_name = st.selectbox("Choose a Movie:", sorted(user_movie_matrix.columns))
 
-# Display recommendations if input is provided
+# Display recommendations with posters
 if movie_name:
     recommendations = get_similar_movies(movie_name)
     st.write(f"Top 10 Movies similar to **{movie_name}**:")
-    st.write(recommendations)
+    
+    # Show the movie posters and recommendations
+    for index, row in recommendations.iterrows():
+        movie_poster = get_movie_poster(index)
+        if movie_poster:
+            st.image(movie_poster, width=100)
+        st.write(f"{index} - {row['correlation']} (Ratings: {row['num_ratings']})")
