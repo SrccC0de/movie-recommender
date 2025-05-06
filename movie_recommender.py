@@ -9,7 +9,7 @@ column_names = ['user_id', 'item_id', 'rating', 'timestamp']
 df = pd.read_csv("u.data", sep='\t', names=column_names)
 
 # Load movie titles
-movie_titles = pd.read_csv(r"C:\Users\udhay\OneDrive\Documents\Project_PRS\ml-100k\u.item", sep='|', encoding='latin-1', header=None, usecols=[0, 1], names=['item_id', 'title'])
+movie_titles = pd.read_csv("u.item", sep='|', encoding='latin-1', header=None, usecols=[0, 1], names=['item_id', 'title'])
 
 # Merge datasets
 movie_data = pd.merge(df, movie_titles, on='item_id')
