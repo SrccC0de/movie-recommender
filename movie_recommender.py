@@ -11,10 +11,11 @@ def get_movie_poster(movie_name):
     response = requests.get(url)
     data = response.json()
 
-    if data['Response'] == 'True':
-        return data['Poster']  # Returning the poster URL
+    # Ensure there’s a poster URL
+    if data['Response'] == 'True' and 'Poster' in data:
+        return data['Poster']  # Return the valid poster URL
     else:
-        return None
+        return "https://via.placeholder.com/150?text=No+Poster"  # Default image if no poster found
 
 # Load dataset
 column_names = ['user_id', 'item_id', 'rating', 'timestamp']
@@ -62,7 +63,6 @@ if movie_name:
     
     # Show the movie posters and recommendations
     for index, row in recommendations.iterrows():
-        movie_poster = get_movie_poster(index)
-        if movie_poster:
-            st.image(movie_poster, width=100)
-        st.write(f"{index} - {row['correlation']} (Ratings: {row['num_ratings']})")
+        movie_poster = get_movie_poster(index)  # Fetch poster for the movie
+        st.image(movie_poster, width=100)  # Display poster with a fixed width
+        st.write(f"{index} - Correlation: {row['correlation']} (Ratings: {row['num_ratings']})")
